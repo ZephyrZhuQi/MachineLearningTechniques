@@ -35,7 +35,8 @@ def plot_t(x, y, xlabel, ylabel, title, interval):
 
 def decision_stump(X, y, u):#(data, label, weight)
     num_feature = X.shape[1]
-    N = X.shape[0]
+    N = X.shape[0]#data numbers
+    #for any feature i, sort the x values
     X_sort = np.sort(X, axis = 0)
     minus_inf = float('-inf')
     min_Ein = float('inf')
@@ -49,6 +50,7 @@ def decision_stump(X, y, u):#(data, label, weight)
             for s in [-1, +1]:#direction loop
                 score = X[:,i]-theta
                 h = (s*np.where(score>0, +1, -1)).reshape(N,1)#decision stump
+                #u-weighted 0/1 error
                 Ein = 0
                 for k in range(N):
                     if h[k]!=y[k]:
@@ -67,35 +69,39 @@ def adaboost(X, y, X_test, y_test):
     N = X.shape[0]#number of training examples
     N_test = X_test.shape[0]#number of testing examples
     u = (np.ones(N)/N).reshape(N,1)#initial weight
-    T = 300
+    T = 300#iterations
     G_score = np.zeros((N, 1))
     G_score_test = np.zeros((N_test, 1))
-    Ein_gt = []
-    ts = []
-    Ein_Gt = []
-    Ut = []
-    Eout_Gt = []
+    Ein_gt = []#for plot
+    ts = []#for plot
+    Ein_Gt = []#for plot
+    Ut = []#for plot
+    Eout_Gt = []#for plot
     for t in range(T):
         ts.append(t)
         s, i, theta, min_Ein, predict = decision_stump(X, y, u)
+        #Ein(gt)
         Ein_gtt = 0
         for k in range(N):
             if predict[k]!=y[k]:
                 Ein_gtt = Ein_gtt +1
         Ein_gtt = Ein_gtt/N
         Ein_gt.append(Ein_gtt)
+        #for update weights
         epsilon = min_Ein*N/sum(u)
         diamond = np.sqrt((1-epsilon)/epsilon)
+
         alpha = np.log(diamond)
         G_score = G_score + alpha * predict
         G = np.where(G_score>0, +1, -1)
+        #Ein(Gt)
         Ein_Gtt = 0
         for k in range(N):
             if G[k]!=y[k]:
                 Ein_Gtt = Ein_Gtt + 1
         Ein_Gtt = Ein_Gtt/N
         Ein_Gt.append(Ein_Gtt)
-
+        #Eout(Gt)
         Eout_Gtt = 0
         score = X_test[:,i]-theta
         h = (s*np.where(score>0, +1, -1)).reshape(N_test,1)#decision stump
@@ -106,8 +112,9 @@ def adaboost(X, y, X_test, y_test):
                 Eout_Gtt = Eout_Gtt + 1
         Eout_Gtt = Eout_Gtt / N_test
         Eout_Gt.append(Eout_Gtt)
-
+        #Ut
         Ut.append(float(sum(u)))
+        #update weights
         for k in range(N):
             if predict[k]!= y[k]:
                 u[k] = u[k]*diamond
