@@ -54,7 +54,7 @@ def plotTree(myTree, parentPt, nodeTxt):#if the first key tells you what feat wa
     plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
 #if you do get a dictonary you know it's a tree, and the first element will be another dict
 
-def createPlot(inTree,i):
+def createPlot(inTree):
     fig = plt.figure(1, facecolor='white')
     fig.clf()
     axprops = dict(xticks=[], yticks=[])
@@ -65,7 +65,8 @@ def createPlot(inTree,i):
     plotTree.totalD = float(getTreeDepth(inTree)) #get the depth
     plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0
     plotTree(inTree, (0.5,1.0), '')
-    plt.savefig('DecisionTree_height'+str(i)+'.png')
-    plt.show()
+    #plt.savefig('DecisionTree_height'+str(i)+'.png')
+    #plt.show()
+    #plt.pause(0.1)
 
 

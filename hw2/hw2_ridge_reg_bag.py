@@ -12,7 +12,7 @@ def read_file(file):
         for line in f:
             data = line.split()
             data = ['1'] + data
-            if i < 400:
+            if i < 400: # use the first 400 examples for training
                 X_train.append([float(x) for x in data[:-1]])
                 y_train.append(int(data[-1]))
             else:
@@ -40,9 +40,10 @@ def main():
         Eout = 0
         y_train_real = np.zeros(num_train)
         y_predict_real = np.zeros(num_test)
-        for iteration in range(250):
-            idxs = np.random.randint(0, num_train, size = num_train)#bootstrapping
-            X_train_t = []
+        for iteration in range(250): # 250 iterations of bagging (250 gt's)
+            #bootstrapping using uniform distribution
+            idxs = np.random.randint(0, num_train, size = num_train)
+            X_train_t = []# 400 bootstrapped examples
             y_train_t = []
             for i in idxs:
                 X_train_t.append(X_train[i])
@@ -51,13 +52,21 @@ def main():
             y_train_t = np.array(y_train_t)
             left = np.linalg.inv(np.dot(X_train_t.transpose(), X_train_t) + lambd * np.eye(num_feature))
             right = np.dot(X_train_t.transpose(), y_train_t)
-            WREG = np.dot(left, right) #ridge regression for one gt
-            y_train_real_t = np.dot(X_train, WREG)#regression of gt
-            y_train_sign_t = np.where(y_train_real_t>0, +1, -1)#classification of gt
-            y_train_real = y_train_real + y_train_sign_t#uniform blending for train set
-            y_predict_real_t = np.dot(X_test, WREG)#regression of gt for test set  
-            y_predict_sign_t = np.where(y_predict_real_t>0, +1, -1)#classification of gt for test set
-            y_predict_real = y_predict_real + y_predict_sign_t#uniform blending for test set
+            #ridge regression for one gt
+            WREG = np.dot(left, right) 
+            #regression of gt
+            y_train_real_t = np.dot(X_train, WREG)
+            #classification of gt
+            y_train_sign_t = np.where(y_train_real_t>0, +1, -1)
+            #uniform blending for train set
+            y_train_real = y_train_real + y_train_sign_t
+            #regression of gt for test set 
+            y_predict_real_t = np.dot(X_test, WREG) 
+            #classification of gt for test set
+            y_predict_sign_t = np.where(y_predict_real_t>0, +1, -1)
+            #uniform blending for test set
+            y_predict_real = y_predict_real + y_predict_sign_t
+        # take the sign operation before uniform aggregation
         y_train_sign = np.where(y_train_real>0, +1, -1)
         y_predict_sign = np.where(y_predict_real>0, +1, -1)
         for i in range(num_train):

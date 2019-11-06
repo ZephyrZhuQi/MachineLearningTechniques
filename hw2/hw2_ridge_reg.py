@@ -12,7 +12,7 @@ def read_file(file):
         for line in f:
             data = line.split()
             data = ['1'] + data
-            if i < 400:
+            if i < 400:# use the first 400 examples for training to get g
                 X_train.append([float(x) for x in data[:-1]])
                 y_train.append(int(data[-1]))
             else:
@@ -33,12 +33,12 @@ def main():
     lambdas = [0.05, 0.5, 5, 50, 500]
     Eins = []
     Eouts = []
-    for lambd in lambdas:
+    for lambd in lambdas:# avoid using keyword lambda
         Ein = 0
         Eout = 0
         left = np.linalg.inv(np.dot(X_train.transpose(), X_train) + lambd * np.eye(num_feature))
         right = np.dot(X_train.transpose(), y_train)
-        WREG = np.dot(left, right) #ridge regression
+        WREG = np.dot(left, right) #ridge regression equation
         y_train_real = np.dot(X_train, WREG)
         y_train_sign = np.where(y_train_real>0, +1, -1)
         num_train = X_train.shape[0]

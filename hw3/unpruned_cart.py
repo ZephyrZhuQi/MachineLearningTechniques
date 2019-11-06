@@ -90,8 +90,8 @@ def DecisionTree(X,y):
     else:
         s,i,theta,left_X,left_y,right_X,right_y = decision_stump(X,y)
         print("feature %d > %f?"%(i,theta))
-        plot_line(i,theta)
-        plt.pause(1)
+        #plot_line(i,theta) for random forest
+        #plt.pause(1)
         #iteration = iteration + 1
         #if iteration == 5:
         #    return 
